@@ -34,7 +34,7 @@
 
       //llegadas
       var tiempo = 0;
-      var tiempo_maximo = 60;
+      var tiempo_maximo = 30000;
       var eventos = [];
 
       while (tiempo < tiempo_maximo) {
@@ -65,7 +65,7 @@
 
         tiempo = evento.tiempo_evento;
         piezas_max = Math.max(piezas_max, cola_espera.length);
-        for (let index = 0; index < 60; index++) {
+       
           if (evento.tipo_evento == "llegada_lavado") {
             if (cola_espera.length == 0 && inspector_ocupado == false) {
               inspector_ocupado = true;
@@ -94,7 +94,6 @@
             }
           }
         }
-      }
 
       var tiempo_total_lavado = 0;
 
@@ -116,15 +115,15 @@
       var utilizacion = tiempo_total_lavado / tiempo_maximo;
       var promedio_permanencia = pieza.tiempo_evento / eventos.length;
       var espera_promedio = console.log(
-        "La utilización del operario es de: " + utilizacion
+        "La utilización del operario es de: " + (utilizacion)
       );
       console.log(
         "El tiempo promedio de permanencia de las piezas en todo el proceso es de: " +
-          promedio_permanencia / eventos.length
+          (promedio_permanencia / eventos.length)
       );
       console.log(
         "El tiempo promedio de espera de las piezas antes de ser limpiadas es de: " +
-          promedio_espera / eventos.length
+          (promedio_espera / eventos.length)
       );
     </script>
   </body>
