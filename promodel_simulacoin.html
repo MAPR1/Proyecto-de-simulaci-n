@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      class Evento {
+        constructor(
+          tipo_evento,
+          tiempo_creacion,
+          tiempo_salida,
+          tiempo_inspeccion,
+          tiempo_evento
+        ) {
+          this.tipo_evento = "";
+          this.tiempo_creacion = 0;
+          this.tiempo_salida = 0;
+          this.tiempo_inspeccion = 0;
+          this.tiempo_evento = 0;
+        }
+      }
+
+      var b = 0.833333; //50 segundos
+      var a = 0.166667; // 10 segundos
+
+      function uniforme(a, b) {
+        var u = a + Math.random() * (b - a);
+        return u;
+      }
+      uniforme(a, b);
+
+      //llegadas
+      var tiempo = 0;
+      var tiempo_maximo = 60;
+      var eventos = [];
+
+      while (tiempo < tiempo_maximo) {
+        for (var index = 0; index < 60; index++) {
+          evento = new Evento();
+          evento.tiempo_creacion = tiempo + 60;
+          evento.tiempo_evento = evento.tiempo_creacion;
+          evento.tipo_evento = "llegada_lavado";
+          eventos.unshift(evento);
+        }
+
+        tiempo = tiempo + 60;
+      }
+
+      //inicio de la simulación
+      tiempo = 0;
+      var cola_espera = [];
+      var salidas = [];
+      var inspector_ocupado = false;
+      var piezas_max = 0;
+
+      while (tiempo < tiempo_maximo) {
+        eventos.sort((a, b) => {
+          return a.tiempo_evento - b.tiempo_evento;
+        });
+
+        evento = eventos.shift(0);
+
+        tiempo = evento.tiempo_evento;
+        piezas_max = Math.max(piezas_max, cola_espera.length);
+        for (let index = 0; index < 60; index++) {
+          if (evento.tipo_evento == "llegada_lavado") {
+            if (cola_espera.length == 0 && inspector_ocupado == false) {
+              inspector_ocupado = true;
+              evento.tiempo_inspeccion = tiempo;
+              evento.tiempo_evento = tiempo + uniforme(a, b);
+              evento.tipo_evento = "salida_lavado";
+              evento.tiempo_salida = evento.tiempo_evento;
+              eventos.unshift(evento);
+            } else {
+              cola_espera.unshift(evento);
+            }
+          } else if (evento.tipo_evento == "salida_lavado") {
+            inspector_ocupado = false;
+            evento.tiempo_salida = tiempo;
+            salidas.unshift(evento);
+
+            if (cola_espera.length > 0) {
+              var pieza = cola_espera.shift(0);
+              inspector_ocupado = true;
+              pieza.tiempo_inspeccion = tiempo;
+              pieza.tiempo_evento = tiempo + uniforme(a, b);
+              pieza.tiempo_salida = pieza.tiempo_evento;
+
+              pieza.tipo_evento = "salida_lavado";
+              eventos.unshift(pieza);
+            }
+          }
+        }
+      }
+
+      var tiempo_total_lavado = 0;
+
+      for (pieza in salidas) {
+        var tiempotlavado = (tiempo_total_lavado +=
+          pieza.tiempo_salida - pieza.tiempo_inspeccion);
+      }
+
+      var promedio_espera = 0;
+      var promedio_permanencia = 0;
+      for (let index = 0; index < eventos.length; index++) {
+        promedio_permanencia += evento.tiempo_salida;
+      }
+
+      for (let index = 0; index < eventos.length; index++) {
+        promedio_espera += evento.tiempo_creacion - evento.tiempo_salida;
+      }
+
+      var utilizacion = tiempo_total_lavado / tiempo_maximo;
+      var promedio_permanencia = pieza.tiempo_evento / eventos.length;
+      var espera_promedio = console.log(
+        "La utilización del operario es de: " + utilizacion
+      );
+      console.log(
+        "El tiempo promedio de permanencia de las piezas en todo el proceso es de: " +
+          promedio_permanencia / eventos.length
+      );
+      console.log(
+        "El tiempo promedio de espera de las piezas antes de ser limpiadas es de: " +
+          promedio_espera / eventos.length
+      );
+    </script>
+  </body>
+</html>
