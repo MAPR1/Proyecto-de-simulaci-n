@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%;">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Equipo JS</title>
   </head>
-  <body>
+
+  <body
+    style="background: url(https://pbs.twimg.com/media/Dz2Qdp5XgAEL4rC.jpg:large); background-size: cover; background-repeat: no-repeat; height: 100%;   position: fixed; top: 0; left: 0;   min-width: 100%;
+  min-height: 100%;"
+  >
     <script>
       class Evento {
         constructor(
@@ -23,18 +27,17 @@
         }
       }
 
-      var b = 0.833333; //50 segundos
-      var a = 0.166667; // 10 segundos
+      const b = 0.833333; //50 segundos
+      const a = 0.166667; // 10 segundos
 
       function uniforme(a, b) {
         var u = a + Math.random() * (b - a);
         return u;
       }
-      uniforme(a, b);
 
       //llegadas
       var tiempo = 0;
-      var tiempo_maximo = 30000;
+      var tiempo_maximo = 30000; // Está en minutos
       var eventos = [];
 
       while (tiempo < tiempo_maximo) {
@@ -43,7 +46,7 @@
           evento.tiempo_creacion = tiempo + 60;
           evento.tiempo_evento = evento.tiempo_creacion;
           evento.tipo_evento = "llegada_lavado";
-          eventos.unshift(evento);
+          eventos.push(evento);
         }
 
         tiempo = tiempo + 60;
@@ -65,65 +68,65 @@
 
         tiempo = evento.tiempo_evento;
         piezas_max = Math.max(piezas_max, cola_espera.length);
-       
-          if (evento.tipo_evento == "llegada_lavado") {
-            if (cola_espera.length == 0 && inspector_ocupado == false) {
-              inspector_ocupado = true;
-              evento.tiempo_inspeccion = tiempo;
-              evento.tiempo_evento = tiempo + uniforme(a, b);
-              evento.tipo_evento = "salida_lavado";
-              evento.tiempo_salida = evento.tiempo_evento;
-              eventos.unshift(evento);
-            } else {
-              cola_espera.unshift(evento);
-            }
-          } else if (evento.tipo_evento == "salida_lavado") {
-            inspector_ocupado = false;
-            evento.tiempo_salida = tiempo;
-            salidas.unshift(evento);
 
-            if (cola_espera.length > 0) {
-              var pieza = cola_espera.shift(0);
-              inspector_ocupado = true;
-              pieza.tiempo_inspeccion = tiempo;
-              pieza.tiempo_evento = tiempo + uniforme(a, b);
-              pieza.tiempo_salida = pieza.tiempo_evento;
+        if (evento.tipo_evento == "llegada_lavado") {
+          if (cola_espera.length == 0 && inspector_ocupado == false) {
+            inspector_ocupado = true;
+            evento.tiempo_inspeccion = tiempo;
+            evento.tiempo_evento = tiempo + uniforme(a, b);
+            evento.tipo_evento = "salida_lavado";
+            evento.tiempo_salida = evento.tiempo_evento;
+            eventos.push(evento);
+          } else {
+            cola_espera.push(evento);
+          }
+        } else if (evento.tipo_evento == "salida_lavado") {
+          inspector_ocupado = false;
+          evento.tiempo_salida = tiempo;
+          salidas.push(evento);
 
-              pieza.tipo_evento = "salida_lavado";
-              eventos.unshift(pieza);
-            }
+          if (cola_espera.length > 0) {
+            var pieza = cola_espera.shift(0);
+            inspector_ocupado = true;
+            pieza.tiempo_inspeccion = tiempo;
+            pieza.tiempo_evento = tiempo + uniforme(a, b);
+            pieza.tiempo_salida = pieza.tiempo_evento;
+            pieza.tipo_evento = "salida_lavado";
+            eventos.push(pieza);
           }
         }
-
-      var tiempo_total_lavado = 0;
-
-      for (pieza in salidas) {
-        var tiempotlavado = (tiempo_total_lavado +=
-          pieza.tiempo_salida - pieza.tiempo_inspeccion);
       }
 
       var promedio_espera = 0;
       var promedio_permanencia = 0;
-      for (let index = 0; index < eventos.length; index++) {
+      var tiempotlavado = 0;
+
+      salidas.forEach(evento => {
+        tiempotlavado += evento.tiempo_salida - evento.tiempo_inspeccion;
+      });
+
+      salidas.forEach(evento => {
         promedio_permanencia += evento.tiempo_salida;
-      }
+      });
 
-      for (let index = 0; index < eventos.length; index++) {
-        promedio_espera += evento.tiempo_creacion - evento.tiempo_salida;
-      }
+      salidas.forEach(evento => {
+        promedio_espera += evento.tiempo_salida - evento.tiempo_creacion;
+      });
 
-      var utilizacion = tiempo_total_lavado / tiempo_maximo;
-      var promedio_permanencia = pieza.tiempo_evento / eventos.length;
-      var espera_promedio = console.log(
-        "La utilización del operario es de: " + (utilizacion)
-      );
+      const tiempoPromedioPermanencia = promedio_permanencia / salidas.length;
+      const utilizacion = tiempotlavado / tiempo_maximo;
+      const tiempo_espera_antes_limpieza = promedio_espera / salidas.length;
+
+      console.log(`La simulación esta hecha en minutos por 500 horas`);
+
+      console.log(`La utilización del operario es de: ${utilizacion}`);
+
       console.log(
-        "El tiempo promedio de permanencia de las piezas en todo el proceso es de: " +
-          (promedio_permanencia / eventos.length)
+        `El tiempo promedio de permanencia de las piezas en todo el proceso es de: ${tiempoPromedioPermanencia}`
       );
+
       console.log(
-        "El tiempo promedio de espera de las piezas antes de ser limpiadas es de: " +
-          (promedio_espera / eventos.length)
+        `El tiempo promedio de espera de las piezas antes de ser limpiadas es de: ${tiempo_espera_antes_limpieza}`
       );
     </script>
   </body>
